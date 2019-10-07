@@ -312,6 +312,21 @@ class Target
       end
 
       @headers['set-cookie'] = res.get_fields('set-cookie').join("\n") unless @headers['set-cookie'].nil?
+      # update cookies
+      if $UPDATE_COOKIES and not @headers['set-cookie'].nil?
+        res.get_fields('set-cookie').each do |raw_cookie|
+          cookie = raw_cookie.split(';')[0]
+          cookie_name = cookie.split('=')[0]
+          cookie_pattern = Regexp.new('%s=.*?(?=$|;)' % cookie_name)
+          if not $CUSTOM_HEADERS.has_key?('Cookie')
+            $CUSTOM_HEADERS['Cookie'] = cookie
+          elsif $CUSTOM_HEADERS['Cookie'].match(cookie_pattern)
+            $CUSTOM_HEADERS['Cookie'].sub!(cookie_pattern, cookie)
+          else
+            $CUSTOM_HEADERS['Cookie'] += '; %s' % cookie
+          end
+        end
+      end
 
       @status = res.code.to_i
       puts @uri.to_s + " [#{status}]" if $verbose > 1
