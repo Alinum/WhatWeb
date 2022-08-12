@@ -212,6 +212,12 @@ EXAMPLE USAGE:
 
 ```
 
+## Docker Usage
+```
+docker build -t whatweb .
+docker run --rm -it whatweb https://example.com
+```
+
 ## Logging & Output
 
 The following types of logging are supported:
